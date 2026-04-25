@@ -159,6 +159,7 @@ type CourseFormData = {
   docente_id: string;
   creditos: string;
   ciclo: string;
+  modalidad: string;
 };
 
 export const validateCourseForm = (
@@ -179,6 +180,7 @@ export const validateCourseForm = (
     messages.push('Ya existe un curso con ese código.');
   }
   if (isBlank(formData.docente_id)) messages.push('Selecciona un docente titular.');
+  if (!['presencial', 'virtual'].includes(formData.modalidad)) messages.push('Selecciona la modalidad del curso.');
   if (!Number.isInteger(credits) || credits < 1 || credits > 10) messages.push('Los créditos deben ser un número entero entre 1 y 10.');
   if (!Number.isInteger(cycle) || cycle < 1 || cycle > 10) messages.push('El ciclo debe ser un número entero entre 1 y 10.');
 
