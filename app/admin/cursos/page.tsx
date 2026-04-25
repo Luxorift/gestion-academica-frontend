@@ -37,7 +37,8 @@ export default function CursosPage() {
     codigo: '',
     docente_id: '',
     creditos: '3',
-    ciclo: '1'
+    ciclo: '1',
+    modalidad: ''
   });
 
   const getDocenteById = (id: string) => {
@@ -63,7 +64,8 @@ export default function CursosPage() {
         codigo: cursoData.codigo.trim().toUpperCase(),
         docente_id: cursoData.docente_id,
         creditos: parseInt(cursoData.creditos),
-        ciclo: parseInt(cursoData.ciclo)
+        ciclo: parseInt(cursoData.ciclo),
+        modalidad: cursoData.modalidad as 'presencial' | 'virtual'
       });
       toast.success('Curso actualizado con éxito');
     } else {
@@ -74,6 +76,8 @@ export default function CursosPage() {
         docente_id: cursoData.docente_id,
         creditos: parseInt(cursoData.creditos),
         ciclo: parseInt(cursoData.ciclo),
+        modalidad: cursoData.modalidad as 'presencial' | 'virtual',
+        zoom_link: '',
         estado: 'activo',
         createdAt: new Date().toISOString()
       });
@@ -85,7 +89,7 @@ export default function CursosPage() {
   };
 
   const resetCursoForm = () => {
-    setCursoData({ nombre: '', codigo: '', docente_id: '', creditos: '3', ciclo: '1' });
+    setCursoData({ nombre: '', codigo: '', docente_id: '', creditos: '3', ciclo: '1', modalidad: '' });
     setEditingCursoId(null);
   };
 
@@ -95,7 +99,8 @@ export default function CursosPage() {
       codigo: curso.codigo,
       docente_id: curso.docente_id,
       creditos: curso.creditos?.toString() || '3',
-      ciclo: curso.ciclo?.toString() || '1'
+      ciclo: curso.ciclo?.toString() || '1',
+      modalidad: curso.modalidad || 'presencial'
     });
     setEditingCursoId(curso.id);
     setIsCursoOpen(true);
@@ -187,6 +192,16 @@ export default function CursosPage() {
                    <div>
                      <label className="text-sm font-medium">Ciclo</label>
                      <Input required type="number" min="1" max="10" value={cursoData.ciclo} onChange={e => setCursoData({...cursoData, ciclo: e.target.value})} />
+                   </div>
+                   <div className="col-span-2">
+                     <label className="text-sm font-medium">Modalidad</label>
+                     <Select value={cursoData.modalidad} onValueChange={val => setCursoData({...cursoData, modalidad: val})}>
+                        <SelectTrigger><SelectValue placeholder="Seleccionar modalidad" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="presencial">Presencial</SelectItem>
+                          <SelectItem value="virtual">Virtual</SelectItem>
+                        </SelectContent>
+                     </Select>
                    </div>
                  </div>
                  <div className="flex justify-end pt-4">
@@ -280,6 +295,9 @@ export default function CursosPage() {
                       </div>
                       <div className="flex gap-2">
                         <Badge variant="outline" className="bg-gray-50">Ciclo {curso.ciclo}</Badge>
+                        <Badge variant="outline" className={curso.modalidad === 'virtual' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-gray-50 text-gray-700'}>
+                          {curso.modalidad === 'virtual' ? 'Virtual' : 'Presencial'}
+                        </Badge>
                       </div>
                     </div>
                     

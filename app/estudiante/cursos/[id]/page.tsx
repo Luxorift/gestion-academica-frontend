@@ -5,7 +5,8 @@ import { useAuth } from '@/lib/context/AuthContext';
 import { useAppData } from '@/lib/hooks/useAppData';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, FileText, DownloadCloud, BookOpen } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, FileText, DownloadCloud, BookOpen, Video, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 
@@ -108,6 +109,26 @@ export default function EstudianteCursoPage({ params }: { params: Promise<{ id: 
                               <DownloadCloud className="h-4 w-4" />
                               Descargar Material
                             </a>
+                         </div>
+                       )}
+
+                       {curso.modalidad === 'virtual' && contenido.zoom_link && (
+                         <div className="mt-4 p-4 bg-emerald-50 rounded-xl border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 bg-emerald-100 text-emerald-700 rounded-lg">
+                                <Video className="h-6 w-6" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-semibold text-emerald-950">Clase virtual de la semana</p>
+                                <p className="text-xs text-emerald-700">Enlace registrado por el docente</p>
+                              </div>
+                            </div>
+                            <Button className="bg-emerald-700 hover:bg-emerald-800 whitespace-nowrap" asChild>
+                              <a href={contenido.zoom_link} target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="h-4 w-4 mr-2" />
+                                Acceder a clase
+                              </a>
+                            </Button>
                          </div>
                        )}
                      </CardContent>
