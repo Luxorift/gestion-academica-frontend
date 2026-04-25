@@ -16,10 +16,13 @@ import {
 } from '@/components/ui/select';
 import { CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { toast } from 'sonner';
+import { validateAttendance } from '@/lib/validation';
+import { useValidationModal } from '@/components/ui/validation-modal';
 
 export default function AsistenciaPage() {
   const { user } = useAuth();
   const { getCursosByDocente, getMatriculasByCurso, appState, getAsistenciasByCurso, addAsistencia } = useAppData();
+  const { showValidation, validationModal } = useValidationModal();
   
   const [selectedCurso, setSelectedCurso] = useState<string>('');
   const [selectedFecha, setSelectedFecha] = useState(new Date().toISOString().split('T')[0]);
@@ -36,6 +39,9 @@ export default function AsistenciaPage() {
   const matriculas = selectedCurso ? getMatriculasByCurso(selectedCurso) : [];
 
   const handleGuardarAsistencia = () => {
+    const markedCount = Object.values(asistencia).filter(Boolean).length;
+    if (showValidation(validateAttendance(selectedCurso, selectedFecha, markedCount))) return;
+
     let count = 0;
     matriculas.forEach(mat => {
       const estado = asistencia[mat.estudiante_id];
@@ -168,6 +174,7 @@ export default function AsistenciaPage() {
           </Card>
         )}
       </div>
+      {validationModal}
     </MainLayout>
   );
 }

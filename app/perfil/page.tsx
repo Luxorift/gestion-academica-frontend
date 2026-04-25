@@ -8,10 +8,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { validatePasswordChange } from '@/lib/validation';
+import { useValidationModal } from '@/components/ui/validation-modal';
 
 export default function MiPerfilPage() {
   const { user } = useAuth();
   const { appState, updateAppState } = useAppData();
+  const { showValidation, validationModal } = useValidationModal();
   
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -21,6 +24,7 @@ export default function MiPerfilPage() {
 
   const handleUpdatePassword = (e: React.FormEvent) => {
     e.preventDefault();
+    if (showValidation(validatePasswordChange(newPassword, confirmPassword, currentPassword, true))) return;
 
     if (newPassword !== confirmPassword) {
       toast.error('Las contraseñas nuevas no coinciden');
@@ -136,6 +140,7 @@ export default function MiPerfilPage() {
           </CardContent>
         </Card>
       </div>
+      {validationModal}
     </MainLayout>
   );
 }

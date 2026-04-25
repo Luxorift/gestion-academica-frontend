@@ -19,9 +19,12 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BookOpen, Users, Plus, Edit2, Trash2, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
+import { validateCourseForm } from '@/lib/validation';
+import { useValidationModal } from '@/components/ui/validation-modal';
 
 export default function CursosPage() {
   const { appState, addCurso, updateCurso, deleteCurso, addMatricula, removeMatricula } = useAppData();
+  const { showValidation, validationModal } = useValidationModal();
   
   const [isCursoOpen, setIsCursoOpen] = useState(false);
   const [isMatriculaOpen, setIsMatriculaOpen] = useState(false);
@@ -47,6 +50,8 @@ export default function CursosPage() {
 
   const handleCursoSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (showValidation(validateCourseForm(cursoData, appState.cursos || [], editingCursoId))) return;
+
     if (!cursoData.nombre || !cursoData.codigo || !cursoData.docente_id) {
       toast.error('Nombre, código y docente son obligatorios');
       return;
@@ -54,8 +59,8 @@ export default function CursosPage() {
 
     if (editingCursoId) {
       updateCurso(editingCursoId, {
-        nombre: cursoData.nombre,
-        codigo: cursoData.codigo,
+        nombre: cursoData.nombre.trim(),
+        codigo: cursoData.codigo.trim().toUpperCase(),
         docente_id: cursoData.docente_id,
         creditos: parseInt(cursoData.creditos),
         ciclo: parseInt(cursoData.ciclo)
@@ -64,12 +69,13 @@ export default function CursosPage() {
     } else {
       addCurso({
         id: `curso-${Date.now()}`,
-        nombre: cursoData.nombre,
-        codigo: cursoData.codigo,
+        nombre: cursoData.nombre.trim(),
+        codigo: cursoData.codigo.trim().toUpperCase(),
         docente_id: cursoData.docente_id,
         creditos: parseInt(cursoData.creditos),
         ciclo: parseInt(cursoData.ciclo),
-        estado: 'activo'
+        estado: 'activo',
+        createdAt: new Date().toISOString()
       });
       toast.success('Curso creado con éxito');
     }
@@ -314,6 +320,7 @@ export default function CursosPage() {
           </CardContent>
         </Card>
       </div>
+      {validationModal}
     </MainLayout>
   );
 }

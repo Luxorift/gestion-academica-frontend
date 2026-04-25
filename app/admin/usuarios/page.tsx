@@ -25,10 +25,13 @@ import {
 import { Plus, Edit2, Trash2, Shield, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { UserRole } from '@/lib/types';
+import { validateUserForm } from '@/lib/validation';
+import { useValidationModal } from '@/components/ui/validation-modal';
 
 export default function GestionUsuariosPage() {
   const { user } = useAuth();
   const { appState, updateAppState } = useAppData();
+  const { showValidation, validationModal } = useValidationModal();
   
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -58,15 +61,12 @@ export default function GestionUsuariosPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.nombre || !formData.email) {
-      toast.error('Nombre y correo son obligatorios');
-      return;
-    }
+    if (showValidation(validateUserForm(formData, appState.usuarios || [], editingId))) return;
 
     const baseUser = {
-      nombre: formData.nombre,
-      apellido: formData.apellido,
-      email: formData.email,
+      nombre: formData.nombre.trim(),
+      apellido: formData.apellido.trim(),
+      email: formData.email.trim().toLowerCase(),
       rol: formData.rol,
       estado: 'activo',
     };
@@ -89,7 +89,7 @@ export default function GestionUsuariosPage() {
          toast.error('La contraseña es obligatoria para usuarios nuevos');
          return;
        }
-       userObj = { ...userObj, id: `${formData.rol.toLowerCase()}-${Date.now()}`, createdAt: new Date().toISOString() };
+       userObj = { ...userObj, id: `${formData.rol.toLowerCase()}-${Date.now()}`, password: formData.password, createdAt: new Date().toISOString() };
        updateAppState({
          usuarios: [...(appState.usuarios || []), userObj]
        });
@@ -285,6 +285,7 @@ export default function GestionUsuariosPage() {
           </CardContent>
         </Card>
       </div>
+      {validationModal}
     </MainLayout>
   );
 }

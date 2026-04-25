@@ -19,10 +19,13 @@ import {
 import { ArrowLeft, Plus, Edit2, Trash2, FileText, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { invalid, validateContentForm } from '@/lib/validation';
+import { useValidationModal } from '@/components/ui/validation-modal';
 
 export default function DocenteCursoPage({ params }: { params: Promise<{ id: string }> }) {
   const { user } = useAuth();
   const { getCursoById, getContenidosByCurso, addContenido, updateContenido, deleteContenido } = useAppData();
+  const { showValidation, validationModal } = useValidationModal();
   
   const resolvedParams = React.use(params);
   const cursoId = resolvedParams.id;
@@ -46,7 +49,7 @@ export default function DocenteCursoPage({ params }: { params: Promise<{ id: str
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('El archivo excede los 5MB permitidos');
+      showValidation(invalid('Archivo demasiado grande', ['El material complementario no debe superar los 5 MB.']));
       return;
     }
 
@@ -63,6 +66,13 @@ export default function DocenteCursoPage({ params }: { params: Promise<{ id: str
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const editingWeek = editingId ? contenidos.find((contenido) => contenido.id === editingId)?.semana_numero : undefined;
+    if (showValidation(validateContentForm(
+      formData,
+      contenidos.map((contenido) => contenido.semana_numero),
+      editingWeek,
+    ))) return;
+
     if (!formData.semana_numero || !formData.titulo) {
       toast.error('Número de semana y título son obligatorios');
       return;
@@ -72,8 +82,8 @@ export default function DocenteCursoPage({ params }: { params: Promise<{ id: str
       if (editingId) {
         updateContenido(editingId, {
           semana_numero: parseInt(formData.semana_numero),
-          titulo: formData.titulo,
-          descripcion: formData.descripcion,
+          titulo: formData.titulo.trim(),
+          descripcion: formData.descripcion.trim(),
           archivo: formData.archivo || undefined,
           nombre_archivo: formData.nombre_archivo || undefined,
         });
@@ -84,8 +94,8 @@ export default function DocenteCursoPage({ params }: { params: Promise<{ id: str
           id: `sem-${Date.now()}`,
           curso_id: cursoId,
           semana_numero: parseInt(formData.semana_numero),
-          titulo: formData.titulo,
-          descripcion: formData.descripcion,
+          titulo: formData.titulo.trim(),
+          descripcion: formData.descripcion.trim(),
           archivo: formData.archivo || undefined,
           nombre_archivo: formData.nombre_archivo || undefined,
           createdAt: new Date().toISOString()
@@ -276,6 +286,7 @@ export default function DocenteCursoPage({ params }: { params: Promise<{ id: str
            )}
         </div>
       </div>
+      {validationModal}
     </MainLayout>
   );
 }
