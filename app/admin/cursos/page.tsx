@@ -19,12 +19,9 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BookOpen, Users, Plus, Edit2, Trash2, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
-import { validateCourseForm } from '@/lib/validation';
-import { useValidationModal } from '@/components/ui/validation-modal';
 
 export default function CursosPage() {
   const { appState, addCurso, updateCurso, deleteCurso, addMatricula, removeMatricula } = useAppData();
-  const { showValidation, validationModal } = useValidationModal();
   
   const [isCursoOpen, setIsCursoOpen] = useState(false);
   const [isMatriculaOpen, setIsMatriculaOpen] = useState(false);
@@ -37,7 +34,8 @@ export default function CursosPage() {
     codigo: '',
     docente_id: '',
     creditos: '3',
-    ciclo: '1'
+    ciclo: '1',
+    modalidad: ''
   });
 
   const getDocenteById = (id: string) => {
@@ -50,8 +48,6 @@ export default function CursosPage() {
 
   const handleCursoSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (showValidation(validateCourseForm(cursoData, appState.cursos || [], editingCursoId))) return;
-
     if (!cursoData.nombre || !cursoData.codigo || !cursoData.docente_id) {
       toast.error('Nombre, código y docente son obligatorios');
       return;
@@ -59,11 +55,12 @@ export default function CursosPage() {
 
     if (editingCursoId) {
       updateCurso(editingCursoId, {
-        nombre: cursoData.nombre.trim(),
-        codigo: cursoData.codigo.trim().toUpperCase(),
+        nombre: cursoData.nombre,
+        codigo: cursoData.codigo,
         docente_id: cursoData.docente_id,
         creditos: parseInt(cursoData.creditos),
-        ciclo: parseInt(cursoData.ciclo)
+        ciclo: parseInt(cursoData.ciclo),
+        modalidad: cursoData.modalidad as 'presencial' | 'virtual'
       });
       toast.success('Curso actualizado con éxito');
     } else {
@@ -74,6 +71,7 @@ export default function CursosPage() {
         docente_id: cursoData.docente_id,
         creditos: parseInt(cursoData.creditos),
         ciclo: parseInt(cursoData.ciclo),
+        modalidad: cursoData.modalidad as 'presencial' | 'virtual',
         estado: 'activo',
         createdAt: new Date().toISOString()
       });
@@ -85,7 +83,7 @@ export default function CursosPage() {
   };
 
   const resetCursoForm = () => {
-    setCursoData({ nombre: '', codigo: '', docente_id: '', creditos: '3', ciclo: '1' });
+    setCursoData({ nombre: '', codigo: '', docente_id: '', creditos: '3', ciclo: '1', modalidad: '' });
     setEditingCursoId(null);
   };
 
@@ -95,7 +93,8 @@ export default function CursosPage() {
       codigo: curso.codigo,
       docente_id: curso.docente_id,
       creditos: curso.creditos?.toString() || '3',
-      ciclo: curso.ciclo?.toString() || '1'
+      ciclo: curso.ciclo?.toString() || '1',
+      modalidad: curso.modalidad || 'presencial'
     });
     setEditingCursoId(curso.id);
     setIsCursoOpen(true);
@@ -187,6 +186,16 @@ export default function CursosPage() {
                    <div>
                      <label className="text-sm font-medium">Ciclo</label>
                      <Input required type="number" min="1" max="10" value={cursoData.ciclo} onChange={e => setCursoData({...cursoData, ciclo: e.target.value})} />
+                   </div>
+                   <div className="col-span-2">
+                     <label className="text-sm font-medium">Modalidad</label>
+                     <Select value={cursoData.modalidad} onValueChange={val => setCursoData({...cursoData, modalidad: val})}>
+                        <SelectTrigger><SelectValue placeholder="Seleccionar modalidad" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="presencial">Presencial</SelectItem>
+                          <SelectItem value="virtual">Virtual</SelectItem>
+                        </SelectContent>
+                     </Select>
                    </div>
                  </div>
                  <div className="flex justify-end pt-4">
@@ -280,6 +289,9 @@ export default function CursosPage() {
                       </div>
                       <div className="flex gap-2">
                         <Badge variant="outline" className="bg-gray-50">Ciclo {curso.ciclo}</Badge>
+                        <Badge variant="outline" className={curso.modalidad === 'virtual' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-gray-50 text-gray-700'}>
+                          {curso.modalidad === 'virtual' ? 'Virtual' : 'Presencial'}
+                        </Badge>
                       </div>
                     </div>
                     
@@ -320,7 +332,6 @@ export default function CursosPage() {
           </CardContent>
         </Card>
       </div>
-      {validationModal}
     </MainLayout>
   );
 }

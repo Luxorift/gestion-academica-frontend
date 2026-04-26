@@ -180,6 +180,7 @@ export const seedData: AppState = {
       creditos: 4,
       docente_id: 'docente-1',
       ciclo: 1,
+      modalidad: 'presencial',
       createdAt: '2024-01-01',
     },
     {
@@ -189,6 +190,7 @@ export const seedData: AppState = {
       creditos: 4,
       docente_id: 'docente-1',
       ciclo: 3,
+      modalidad: 'presencial',
       createdAt: '2024-01-01',
     },
     {
@@ -198,6 +200,7 @@ export const seedData: AppState = {
       creditos: 3,
       docente_id: 'docente-1',
       ciclo: 5,
+      modalidad: 'presencial',
       createdAt: '2024-01-01',
     },
     {
@@ -207,6 +210,7 @@ export const seedData: AppState = {
       creditos: 4,
       docente_id: 'docente-2',
       ciclo: 1,
+      modalidad: 'presencial',
       createdAt: '2024-01-01',
     },
     {
@@ -216,6 +220,7 @@ export const seedData: AppState = {
       creditos: 2,
       docente_id: 'docente-3',
       ciclo: 1,
+      modalidad: 'presencial',
       createdAt: '2024-01-01',
     },
   ],
@@ -322,6 +327,13 @@ import { toast } from 'sonner';
 
 let memoryAppState: AppState = seedData;
 
+const normalizeCursos = (cursos: any[]): Curso[] =>
+  cursos.map((curso) => ({
+    ...curso,
+    modalidad: curso.modalidad === 'virtual' ? 'virtual' : 'presencial',
+    zoom_link: curso.zoom_link || '',
+  }));
+
 // Initialize localforage with seed data
 export async function initializeSeedData() {
   if (typeof window !== 'undefined') {
@@ -347,7 +359,7 @@ export async function initializeSeedData() {
     if (rawData) {
       memoryAppState = {
         usuarios: (rawData.usuarios && rawData.usuarios.length > 0) ? rawData.usuarios : seedData.usuarios,
-        cursos: rawData.cursos || seedData.cursos,
+        cursos: normalizeCursos(rawData.cursos || seedData.cursos),
         matriculas: rawData.matriculas || seedData.matriculas,
         notas: rawData.notas || seedData.notas,
         tareas: rawData.tareas || seedData.tareas,

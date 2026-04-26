@@ -16,30 +16,28 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { ArrowLeft, Plus, Edit2, Trash2, FileText, Upload } from 'lucide-react';
+import { ArrowLeft, Plus, Edit2, Trash2, FileText, Upload, Video } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { invalid, validateContentForm } from '@/lib/validation';
-import { useValidationModal } from '@/components/ui/validation-modal';
 
 export default function DocenteCursoPage({ params }: { params: Promise<{ id: string }> }) {
   const { user } = useAuth();
   const { getCursoById, getContenidosByCurso, addContenido, updateContenido, deleteContenido } = useAppData();
-  const { showValidation, validationModal } = useValidationModal();
   
   const resolvedParams = React.use(params);
   const cursoId = resolvedParams.id;
   
   const curso = getCursoById(cursoId);
   const contenidos = getContenidosByCurso(cursoId);
+  const isVirtualCourse = curso?.modalidad === 'virtual';
 
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-
   const [formData, setFormData] = useState({
     semana_numero: '',
     titulo: '',
     descripcion: '',
+    zoom_link: '',
     archivo: '',
     nombre_archivo: ''
   });
@@ -49,7 +47,7 @@ export default function DocenteCursoPage({ params }: { params: Promise<{ id: str
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      showValidation(invalid('Archivo demasiado grande', ['El material complementario no debe superar los 5 MB.']));
+      toast.error('El archivo excede los 5MB permitidos');
       return;
     }
 
@@ -66,24 +64,25 @@ export default function DocenteCursoPage({ params }: { params: Promise<{ id: str
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const editingWeek = editingId ? contenidos.find((contenido) => contenido.id === editingId)?.semana_numero : undefined;
-    if (showValidation(validateContentForm(
-      formData,
-      contenidos.map((contenido) => contenido.semana_numero),
-      editingWeek,
-    ))) return;
-
     if (!formData.semana_numero || !formData.titulo) {
       toast.error('Número de semana y título son obligatorios');
       return;
     }
 
     try {
+      const normalizedZoomLink = formData.zoom_link.trim();
+
+      if (isVirtualCourse && normalizedZoomLink && !/^https?:\/\/.+/i.test(normalizedZoomLink)) {
+        showValidation(invalid('Revisa la clase virtual', ['El enlace debe iniciar con http:// o https://.']));
+        return;
+      }
+
       if (editingId) {
         updateContenido(editingId, {
           semana_numero: parseInt(formData.semana_numero),
           titulo: formData.titulo.trim(),
           descripcion: formData.descripcion.trim(),
+          zoom_link: isVirtualCourse ? normalizedZoomLink || undefined : undefined,
           archivo: formData.archivo || undefined,
           nombre_archivo: formData.nombre_archivo || undefined,
         });
@@ -96,6 +95,7 @@ export default function DocenteCursoPage({ params }: { params: Promise<{ id: str
           semana_numero: parseInt(formData.semana_numero),
           titulo: formData.titulo.trim(),
           descripcion: formData.descripcion.trim(),
+          zoom_link: isVirtualCourse ? normalizedZoomLink || undefined : undefined,
           archivo: formData.archivo || undefined,
           nombre_archivo: formData.nombre_archivo || undefined,
           createdAt: new Date().toISOString()
@@ -110,7 +110,7 @@ export default function DocenteCursoPage({ params }: { params: Promise<{ id: str
   };
 
   const resetForm = () => {
-    setFormData({semana_numero: '', titulo: '', descripcion: '', archivo: '', nombre_archivo: ''});
+    setFormData({semana_numero: '', titulo: '', descripcion: '', zoom_link: '', archivo: '', nombre_archivo: ''});
     setEditingId(null);
   };
 
@@ -119,6 +119,7 @@ export default function DocenteCursoPage({ params }: { params: Promise<{ id: str
       semana_numero: contenido.semana_numero.toString(),
       titulo: contenido.titulo,
       descripcion: contenido.descripcion,
+      zoom_link: contenido.zoom_link || '',
       archivo: contenido.archivo || '',
       nombre_archivo: contenido.nombre_archivo || ''
     });
@@ -213,6 +214,19 @@ export default function DocenteCursoPage({ params }: { params: Promise<{ id: str
                 />
               </div>
 
+              {curso.modalidad === 'virtual' && (
+                <div>
+                  <label className="text-sm font-medium">Enlace de clase virtual</label>
+                  <Input
+                    type="url"
+                    value={formData.zoom_link}
+                    onChange={e => setFormData({...formData, zoom_link: e.target.value})}
+                    placeholder="https://zoom.us/j/..."
+                    className="mt-1"
+                  />
+                </div>
+              )}
+
               <div>
                 <label className="text-sm font-medium">Material Complementario (opcional, PDF/Word)</label>
                 <div className="mt-1 border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors">
@@ -280,13 +294,21 @@ export default function DocenteCursoPage({ params }: { params: Promise<{ id: str
                         </a>
                      </div>
                    )}
+                   {curso.modalidad === 'virtual' && contenido.zoom_link && (
+                     <div className="mt-3 flex items-center gap-2 bg-emerald-50 p-3 rounded-md w-fit border border-emerald-100">
+                        <Video className="h-5 w-5 text-emerald-600" />
+                        <span className="text-sm font-medium text-emerald-900">Clase virtual de la semana</span>
+                        <a href={contenido.zoom_link} target="_blank" rel="noopener noreferrer" className="ml-4 text-xs font-bold text-emerald-700 hover:underline">
+                          Abrir enlace
+                        </a>
+                     </div>
+                   )}
                  </CardContent>
                </Card>
              ))
            )}
         </div>
       </div>
-      {validationModal}
     </MainLayout>
   );
 }

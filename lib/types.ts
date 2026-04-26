@@ -44,6 +44,8 @@ export interface Curso {
   creditos: number;
   docente_id: string;
   ciclo: number;
+  modalidad: 'presencial' | 'virtual';
+  zoom_link?: string;
   createdAt: string;
 }
 
@@ -115,6 +117,7 @@ export interface ContenidoSemana {
   semana_numero: number;
   titulo: string;
   descripcion: string;
+  zoom_link?: string;
   archivo?: string;  // Base64 material
   nombre_archivo?: string;
   createdAt: string;
