@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { MaterialAttachment } from '@/components/material/MaterialAttachment';
 import {
   Dialog,
   DialogContent,
@@ -73,7 +74,7 @@ export default function DocenteCursoPage({ params }: { params: Promise<{ id: str
       const normalizedZoomLink = formData.zoom_link.trim();
 
       if (isVirtualCourse && normalizedZoomLink && !/^https?:\/\/.+/i.test(normalizedZoomLink)) {
-        showValidation(invalid('Revisa la clase virtual', ['El enlace debe iniciar con http:// o https://.']));
+        toast.error('El enlace de clase virtual debe iniciar con http:// o https://.');
         return;
       }
 
@@ -286,13 +287,12 @@ export default function DocenteCursoPage({ params }: { params: Promise<{ id: str
                      {contenido.descripcion}
                    </p>
                    {contenido.archivo && (
-                     <div className="flex items-center gap-2 bg-gray-50 p-3 rounded-md w-fit border border-gray-100">
-                        <FileText className="h-5 w-5 text-gray-400" />
-                        <span className="text-sm font-medium text-gray-700 truncate max-w-xs">{contenido.nombre_archivo || 'Documento adjunto'}</span>
-                        <a href={contenido.archivo} download={contenido.nombre_archivo || "material"} className="ml-4 text-xs font-bold text-blue-600 hover:underline">
-                          Decargar a PC
-                        </a>
-                     </div>
+                     <MaterialAttachment
+                       contentId={contenido.id}
+                       fileName={contenido.nombre_archivo}
+                       fileData={contenido.archivo}
+                       downloadName={contenido.nombre_archivo || 'material'}
+                     />
                    )}
                    {curso.modalidad === 'virtual' && contenido.zoom_link && (
                      <div className="mt-3 flex items-center gap-2 bg-emerald-50 p-3 rounded-md w-fit border border-emerald-100">
