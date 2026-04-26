@@ -18,11 +18,11 @@ export const DocenteDashboard: React.FC = () => {
   const entregas = appState.entregas.filter(entrega => tareas.some(t => t.id === entrega.tarea_id));
   const entregasPendientes = entregas.filter(entrega => entrega.calificacion === null).length;
   const entregasTotales = entregas.length;
+  const tareasSinEntregas = tareas.filter(tarea => !entregas.some(e => e.tarea_id === tarea.id)).length;
+  const promedioGeneral = entregas.length > 0 ? entregas.reduce((sum, e) => sum + (e.calificacion || 0), 0) / entregas.length : 0;
   const proximaTarea = tareas
     .filter(t => new Date(t.fecha_entrega).getTime() > Date.now())
     .sort((a, b) => new Date(a.fecha_entrega).getTime() - new Date(b.fecha_entrega).getTime())[0];
-
-  // Calculate stats
   const totalEstudiantes = cursos.reduce((acc, curso) => {
     return acc + getMatriculasByCurso(curso.id).length;
   }, 0);
@@ -123,6 +123,28 @@ export const DocenteDashboard: React.FC = () => {
             <p className="text-xs text-gray-500">
               {proximaTarea ? proximaTarea.titulo : 'No hay entregas próximas'}
             </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Tareas sin entregas</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">{tareasSinEntregas}</div>
+            <p className="text-xs text-gray-500">pendientes</p>
+          </CardContent>
+        </Card>
+
+        <Card>ñ
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Promedio general</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">{promedioGeneral.toFixed(1)}</div>
+            <p className="text-xs text-gray-500">de calificaciones</p>
           </CardContent>
         </Card>
       </div>
