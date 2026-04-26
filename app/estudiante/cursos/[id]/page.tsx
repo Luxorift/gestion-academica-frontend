@@ -6,7 +6,8 @@ import { useAppData } from '@/lib/hooks/useAppData';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, FileText, DownloadCloud, BookOpen, Video, ExternalLink } from 'lucide-react';
+import { MaterialAttachment } from '@/components/material/MaterialAttachment';
+import { ArrowLeft, FileText, BookOpen, Video, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 
@@ -94,22 +95,12 @@ export default function EstudianteCursoPage({ params }: { params: Promise<{ id: 
                        </p>
                        
                        {contenido.archivo && (
-                         <div className="mt-5 p-4 bg-gray-50 rounded-xl border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors hover:bg-gray-100">
-                            <div className="flex items-center gap-3 overflow-hidden">
-                              <div className="p-2 bg-blue-100 text-blue-700 rounded-lg">
-                                <FileText className="h-6 w-6" />
-                              </div>
-                              <div>
-                                <p className="text-sm font-semibold text-gray-900 truncate pr-4">{contenido.nombre_archivo || 'Material de apoyo'}</p>
-                                <p className="text-xs text-gray-500">Documento adjunto</p>
-                              </div>
-                            </div>
-                            <a href={contenido.archivo} download={contenido.nombre_archivo || "material_semana_" + contenido.semana_numero} 
-                               className="flex items-center gap-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-lg transition-colors whitespace-nowrap justify-center">
-                              <DownloadCloud className="h-4 w-4" />
-                              Descargar Material
-                            </a>
-                         </div>
+                         <MaterialAttachment
+                           contentId={contenido.id}
+                           fileName={contenido.nombre_archivo}
+                           fileData={contenido.archivo}
+                           downloadName={contenido.nombre_archivo || "material_semana_" + contenido.semana_numero}
+                         />
                        )}
 
                        {curso.modalidad === 'virtual' && contenido.zoom_link && (
