@@ -10,10 +10,17 @@ import Link from 'next/link';
 
 export const DocenteDashboard: React.FC = () => {
   const { user } = useAuth();
-  const { getCursosByDocente, getMatriculasByCurso, getTareasByCurso } = useAppData();
+  const { getCursosByDocente, getMatriculasByCurso, getTareasByCurso, appState } = useAppData();
   
   const docente = user as Docente;
   const cursos = getCursosByDocente(docente.id);
+  const tareas = cursos.flatMap(curso => getTareasByCurso(curso.id));
+  const entregas = appState.entregas.filter(entrega => tareas.some(t => t.id === entrega.tarea_id));
+  const entregasPendientes = entregas.filter(entrega => entrega.calificacion === null).length;
+  const entregasTotales = entregas.length;
+  const proximaTarea = tareas
+    .filter(t => new Date(t.fecha_entrega).getTime() > Date.now())
+    .sort((a, b) => new Date(a.fecha_entrega).getTime() - new Date(b.fecha_entrega).getTime())[0];
 
   // Calculate stats
   const totalEstudiantes = cursos.reduce((acc, curso) => {
@@ -83,8 +90,39 @@ export const DocenteDashboard: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">12</div>
+            <div className="text-3xl font-bold">{entregasPendientes}</div>
             <p className="text-xs text-gray-500">por calificar</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Total de entregas</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">{entregasTotales}</div>
+            <p className="text-xs text-gray-500">registradas</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Próxima entrega</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-base font-semibold text-gray-900">
+              {proximaTarea
+                ? new Date(proximaTarea.fecha_entrega).toLocaleDateString('es-PE', {
+                    day: '2-digit',
+                    month: 'short',
+                  })
+                : 'Sin fechas'}
+            </div>
+            <p className="text-xs text-gray-500">
+              {proximaTarea ? proximaTarea.titulo : 'No hay entregas próximas'}
+            </p>
           </CardContent>
         </Card>
       </div>
