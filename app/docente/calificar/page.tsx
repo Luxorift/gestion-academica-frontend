@@ -26,10 +26,13 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Edit2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { invalid, validateGrade } from '@/lib/validation';
+import { useValidationModal } from '@/components/ui/validation-modal';
 
 export default function CalificarPage() {
   const { user } = useAuth();
   const { getCursosByDocente, getMatriculasByCurso, getNotasByMatricula, getTareasByCurso, getEntregasByTarea, appState, updateNota, addNota, updateEntrega } = useAppData();
+  const { showValidation, validationModal } = useValidationModal();
   
   const [selectedCurso, setSelectedCurso] = useState<string>('');
   const [editingNota, setEditingNota] = useState<{matriculaId: string, tipo: string, nota?: any} | null>(null);
@@ -49,6 +52,8 @@ export default function CalificarPage() {
   const matriculas = selectedCurso ? getMatriculasByCurso(selectedCurso) : [];
 
   const handleSaveNota = () => {
+    if (showValidation(validateGrade(newCalificacion))) return;
+
     if (!newCalificacion || isNaN(parseFloat(newCalificacion))) {
       toast.error('Ingresa una calificación válida');
       return;
@@ -60,7 +65,10 @@ export default function CalificarPage() {
       return;
     }
 
-    if (!editingNota) return;
+    if (!editingNota) {
+      showValidation(invalid('No se encontro la nota', ['Vuelve a seleccionar la evaluacion que quieres calificar.']));
+      return;
+    }
 
     if (editingNota.nota) {
       updateNota(editingNota.nota.id, { calificacion: calif });
@@ -70,7 +78,8 @@ export default function CalificarPage() {
         matricula_id: editingNota.matriculaId,
         tipo: editingNota.tipo as any,
         calificacion: calif,
-        peso: editingNota.tipo === 'parcial' ? 20 : editingNota.tipo === 'final' ? 30 : 0
+        peso: editingNota.tipo === 'parcial' ? 20 : editingNota.tipo === 'final' ? 30 : 0,
+        fecha: new Date().toISOString().split('T')[0]
       });
     }
 
@@ -80,6 +89,9 @@ export default function CalificarPage() {
   };
 
   const handleSaveEntrega = () => {
+    const selectedTarea = editingEntrega ? appState.tareas.find(t => t.id === editingEntrega.tarea_id) : undefined;
+    if (showValidation(validateGrade(newCalificacionTarea, selectedTarea?.puntaje_total || 20))) return;
+
     if (!newCalificacionTarea || isNaN(parseFloat(newCalificacionTarea))) {
       toast.error('Ingresa una calificación válida');
       return;
@@ -359,6 +371,7 @@ export default function CalificarPage() {
           </Tabs>
         )}
       </div>
+      {validationModal}
     </MainLayout>
   );
 }

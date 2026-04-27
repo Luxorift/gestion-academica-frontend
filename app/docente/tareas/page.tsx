@@ -26,10 +26,13 @@ import {
 } from '@/components/ui/select';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { invalid, validateTaskForm } from '@/lib/validation';
+import { useValidationModal } from '@/components/ui/validation-modal';
 
 export default function TareasPage() {
   const { user } = useAuth();
   const { getCursosByDocente, getTareasByCurso, addTarea, updateTarea, deleteTarea } = useAppData();
+  const { showValidation, validationModal } = useValidationModal();
   
   const [selectedCurso, setSelectedCurso] = useState<string>('');
   const [isOpen, setIsOpen] = useState(false);
@@ -58,7 +61,7 @@ export default function TareasPage() {
   
   const handleOpenNew = () => {
     if (!selectedCurso) {
-      toast.error('Selecciona un curso primero');
+      showValidation(invalid('Selecciona un curso', ['Elige un curso antes de crear una tarea.']));
       return;
     }
     setFormData({ titulo: '', descripcion: '', fecha_entrega: '', puntaje_total: 10, archivo_referencia: '', nombre_archivo: '' });
@@ -84,15 +87,12 @@ export default function TareasPage() {
   const tareas = selectedCurso ? getTareasByCurso(selectedCurso) : [];
 
   const handleSubmit = () => {
-    if (!formData.titulo || !formData.descripcion || !formData.fecha_entrega) {
-      toast.error('Completa todos los campos');
-      return;
-    }
+    if (showValidation(validateTaskForm(formData, selectedCurso))) return;
 
     if (editingTaskId) {
       updateTarea(editingTaskId, {
-        titulo: formData.titulo,
-        descripcion: formData.descripcion,
+        titulo: formData.titulo.trim(),
+        descripcion: formData.descripcion.trim(),
         fecha_entrega: formData.fecha_entrega,
         puntaje_total: formData.puntaje_total,
         archivo_referencia: formData.archivo_referencia || undefined,
@@ -102,8 +102,8 @@ export default function TareasPage() {
       const newTarea: Tarea = {
         id: `tarea-${Date.now()}`,
         curso_id: selectedCurso,
-        titulo: formData.titulo,
-        descripcion: formData.descripcion,
+        titulo: formData.titulo.trim(),
+        descripcion: formData.descripcion.trim(),
         fecha_entrega: formData.fecha_entrega,
         puntaje_total: formData.puntaje_total,
         archivo_referencia: formData.archivo_referencia || undefined,
@@ -291,6 +291,7 @@ export default function TareasPage() {
           </Card>
         )}
       </div>
+      {validationModal}
     </MainLayout>
   );
 }
