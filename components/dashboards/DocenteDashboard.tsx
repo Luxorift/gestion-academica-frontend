@@ -138,7 +138,7 @@ export const DocenteDashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card>ñ
+        <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium">Promedio general</CardTitle>
           </CardHeader>
