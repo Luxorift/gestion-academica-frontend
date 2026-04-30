@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, Edit2, Trash2, Shield, User } from 'lucide-react';
+import { Plus, Edit2, Trash2, Shield, User, Camera } from 'lucide-react';
 import { toast } from 'sonner';
 import { UserRole } from '@/lib/types';
 import { validateUserForm } from '@/lib/validation';
@@ -45,6 +45,7 @@ export default function GestionUsuariosPage() {
     email: '',
     password: '',
     rol: 'ESTUDIANTE',
+    profilePicture: '',
     // Estudiante specific
     carrera: '',
     ciclo: '1',
@@ -63,13 +64,17 @@ export default function GestionUsuariosPage() {
 
     if (showValidation(validateUserForm(formData, appState.usuarios || [], editingId))) return;
 
-    const baseUser = {
+    const baseUser: any = {
       nombre: formData.nombre.trim(),
       apellido: formData.apellido.trim(),
       email: formData.email.trim().toLowerCase(),
       rol: formData.rol,
       estado: 'activo',
     };
+
+    if (formData.profilePicture) {
+      baseUser.profilePicture = formData.profilePicture;
+    }
 
     let userObj: any = { ...baseUser };
 
@@ -101,8 +106,23 @@ export default function GestionUsuariosPage() {
   };
 
   const resetForm = () => {
-    setFormData({nombre: '', apellido: '', email: '', password: '', rol: activeRole, carrera: '', ciclo: '1', codigo: '', especialidad: '', departamento: ''});
+    setFormData({nombre: '', apellido: '', email: '', password: '', rol: activeRole, profilePicture: '', carrera: '', ciclo: '1', codigo: '', especialidad: '', departamento: ''});
     setEditingId(null);
+  };
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('La imagen no debe superar los 2MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, profilePicture: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleEdit = (user: any) => {
@@ -112,6 +132,7 @@ export default function GestionUsuariosPage() {
       email: user.email,
       password: '',
       rol: user.rol,
+      profilePicture: user.profilePicture || '',
       carrera: user.carrera || '',
       ciclo: user.ciclo?.toString() || '1',
       codigo: user.codigo || '',
@@ -200,6 +221,15 @@ export default function GestionUsuariosPage() {
                           <Input required type="password" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="mt-1" />
                         </div>
                       )}
+                      <div className="col-span-2">
+                        <label className="text-sm font-medium">Foto de Perfil (Opcional)</label>
+                        <div className="mt-1 flex items-center gap-4">
+                          {formData.profilePicture && (
+                            <img src={formData.profilePicture} alt="Preview" className="w-10 h-10 rounded-full object-cover border" />
+                          )}
+                          <Input type="file" accept="image/*" onChange={handlePhotoUpload} />
+                        </div>
+                      </div>
                     </div>
 
                     {formData.rol === 'ESTUDIANTE' && (
