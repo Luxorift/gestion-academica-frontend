@@ -13,6 +13,7 @@ export interface User {
   apellido: string;
   rol: UserRole;
   createdAt: string;
+  profilePicture?: string;
 }
 
 // Estudiante
@@ -137,6 +138,7 @@ export interface AuthContextType {
   login: (email: string, password: string) => Promise<AuthResponse>;
   signup: (userData: any) => Promise<AuthResponse>;
   logout: () => void;
+  updateUser: (user: User | Estudiante | Docente | Admin) => void;
 }
 
 // App State
