@@ -114,12 +114,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('nuevaschool_token');
   };
 
+  const updateUser = (updatedUser: User | Estudiante | Docente | Admin) => {
+    setUser(updatedUser);
+    localStorage.setItem('nuevaschool_auth', JSON.stringify(updatedUser));
+  };
+
   const value: AuthContextType = {
     user,
     isAuthenticated,
     login,
     signup,
     logout,
+    updateUser,
   };
 
   if (isLoading) {
