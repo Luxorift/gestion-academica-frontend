@@ -10,9 +10,11 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { validatePasswordChange } from '@/lib/validation';
 import { useValidationModal } from '@/components/ui/validation-modal';
+import { Camera } from 'lucide-react';
+import Image from 'next/image';
 
 export default function MiPerfilPage() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const { appState, updateAppState } = useAppData();
   const { showValidation, validationModal } = useValidationModal();
   
@@ -21,6 +23,32 @@ export default function MiPerfilPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const userId = user?.id;
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('La imagen no debe superar los 2MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        
+        const updatedUsers = appState.usuarios.map(u => 
+          u.id === userId ? { ...u, profilePicture: base64String } : u
+        );
+        updateAppState({ usuarios: updatedUsers });
+        
+        if (user) {
+          updateUser({ ...user, profilePicture: base64String });
+        }
+        
+        toast.success('Foto de perfil actualizada');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleUpdatePassword = (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,6 +119,37 @@ export default function MiPerfilPage() {
                   <p className="text-lg font-medium text-gray-900">{(user as any).ciclo}</p>
                 </div>
               )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Foto de Perfil</CardTitle>
+            <CardDescription>Actualiza tu imagen de perfil</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-6">
+              <div className="relative w-24 h-24 rounded-full overflow-hidden bg-gray-100 border-2 border-gray-200">
+                {user.profilePicture ? (
+                  <img src={user.profilePicture} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    <Camera size={32} />
+                  </div>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={handlePhotoUpload}
+                  className="max-w-xs"
+                />
+                <p className="text-xs text-gray-500">
+                  Sube una imagen (JPG, PNG) de máximo 2MB.
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
