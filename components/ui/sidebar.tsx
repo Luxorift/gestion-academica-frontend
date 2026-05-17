@@ -126,19 +126,15 @@ function SidebarProvider({
     [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar],
   )
 
+  const cssVarsClass = `[--sidebar-width:${SIDEBAR_WIDTH}] [--sidebar-width-icon:${SIDEBAR_WIDTH_ICON}]`
+
   return (
     <SidebarContext.Provider value={contextValue}>
       <TooltipProvider delayDuration={0}>
         <div
           data-slot="sidebar-wrapper"
-          style={
-            {
-              '--sidebar-width': SIDEBAR_WIDTH,
-              '--sidebar-width-icon': SIDEBAR_WIDTH_ICON,
-              ...style,
-            } as React.CSSProperties
-          }
           className={cn(
+            cssVarsClass,
             'group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex min-h-svh w-full',
             className,
           )}
@@ -187,12 +183,7 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
-          style={
-            {
-              '--sidebar-width': SIDEBAR_WIDTH_MOBILE,
-            } as React.CSSProperties
-          }
+          className={`bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden [--sidebar-width:${SIDEBAR_WIDTH_MOBILE}]`}
           side={side}
         >
           <SheetHeader className="sr-only">
@@ -625,13 +616,8 @@ function SidebarMenuSkeleton({
         />
       )}
       <Skeleton
-        className="h-4 max-w-(--skeleton-width) flex-1"
+        className={`h-4 max-w-[${width}] flex-1`}
         data-sidebar="menu-skeleton-text"
-        style={
-          {
-            '--skeleton-width': width,
-          } as React.CSSProperties
-        }
       />
     </div>
   )
