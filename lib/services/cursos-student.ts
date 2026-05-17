@@ -3,7 +3,7 @@
  * Consume los endpoints del backend
  */
 
-import { apiClient } from './api-client';
+import { apiClient } from '../api-client';
 
 export interface Curso {
   id: string;
