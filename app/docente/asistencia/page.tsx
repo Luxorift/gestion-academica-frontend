@@ -75,9 +75,9 @@ export default function AsistenciaPage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium">Curso</label>
+                <label htmlFor="curso-select" className="text-sm font-medium">Curso</label>
                 <Select value={selectedCurso} onValueChange={setSelectedCurso}>
-                  <SelectTrigger className="mt-1">
+                  <SelectTrigger id="curso-select" className="mt-1">
                     <SelectValue placeholder="Selecciona un curso..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -90,8 +90,9 @@ export default function AsistenciaPage() {
                 </Select>
               </div>
               <div>
-                <label className="text-sm font-medium">Fecha</label>
+                <label htmlFor="fecha" className="text-sm font-medium">Fecha</label>
                 <input
+                  id="fecha"
                   type="date"
                   value={selectedFecha}
                   onChange={(e) => setSelectedFecha(e.target.value)}
