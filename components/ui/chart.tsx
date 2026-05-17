@@ -200,24 +200,29 @@ function ChartTooltipContent({
                     <itemConfig.icon />
                   ) : (
                     !hideIndicator && (
-                      <div
+                      <svg
                         className={cn(
-                          'shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)',
-                          {
-                            'h-2.5 w-2.5': indicator === 'dot',
-                            'w-1': indicator === 'line',
-                            'w-0 border-[1.5px] border-dashed bg-transparent':
-                              indicator === 'dashed',
-                            'my-0.5': nestLabel && indicator === 'dashed',
-                          },
+                          'shrink-0 rounded-[2px]',
+                          indicator === 'dot' && 'h-2.5 w-2.5',
+                          indicator === 'line' && 'w-1 h-2.5',
+                          indicator === 'dashed' && 'h-2.5 w-2.5',
+                          nestLabel && indicator === 'dashed' && 'my-0.5',
                         )}
-                        style={
-                          {
-                            '--color-bg': indicatorColor,
-                            '--color-border': indicatorColor,
-                          } as React.CSSProperties
-                        }
-                      />
+                        viewBox="0 0 8 8"
+                        aria-hidden
+                      >
+                        <rect
+                          x="0"
+                          y="0"
+                          width="8"
+                          height="8"
+                          rx="1"
+                          fill={indicatorColor}
+                          stroke={indicator === 'dashed' ? indicatorColor : 'none'}
+                          strokeWidth={indicator === 'dashed' ? 1.5 : 0}
+                          strokeDasharray={indicator === 'dashed' ? '2 2' : undefined}
+                        />
+                      </svg>
                     )
                   )}
                   <div
@@ -287,12 +292,9 @@ function ChartLegendContent({
             {itemConfig?.icon && !hideIcon ? (
               <itemConfig.icon />
             ) : (
-              <div
-                className="h-2 w-2 shrink-0 rounded-[2px]"
-                style={{
-                  backgroundColor: item.color,
-                }}
-              />
+              <svg className="h-2 w-2 shrink-0 rounded-[2px]" viewBox="0 0 8 8" aria-hidden>
+                <rect width="8" height="8" rx="2" fill={item.color} />
+              </svg>
             )}
             {itemConfig?.label}
           </div>
