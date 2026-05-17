@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { AppState, Nota, Tarea, Entrega, Asistencia, Matricula, Curso } from '@/lib/types';
-import { getAppState, saveAppState } from '@/lib/seedData';
+import { getAppState, saveAppState } from './seedData';
 
 export const useAppData = () => {
   const [appState, setAppState] = useState<AppState>(() => getAppState());
