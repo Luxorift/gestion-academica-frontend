@@ -9,9 +9,8 @@ import { Spinner } from '@/components/ui/spinner';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 
-export default function EstudianteCursoPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = React.use(params);
-  const cursoId = resolvedParams.id;
+export default function EstudianteCursoPage({ params }: { params: { id: string } }) {
+  const cursoId = params.id;
   
   const { curso, loading, error } = useStudentCursoDetalle(cursoId);
 
