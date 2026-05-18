@@ -6,24 +6,35 @@ import { useAppData } from '@/lib/hooks/useAppData';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import type { Estudiante } from '@/lib/types';
 
 const COLORS = ['#0F3B82', '#E67E22', '#27AE60', '#E74C3C'];
+
+type EstudiantesPorCiclo = {
+  ciclo: number;
+  cantidad: number;
+};
+
+type EstudiantesPorCarrera = {
+  name: string;
+  value: number;
+};
 
 export default function ReportesPage() {
   const { appState } = useAppData();
   
   // Estudiantes por ciclo
-  const estudiantes = appState.usuarios.filter(u => u.rol === 'ESTUDIANTE') as any[];
-  const estudiantesPorCiclo = estudiantes.reduce((acc, est) => {
+  const estudiantes = appState.usuarios.filter((u): u is Estudiante => u.rol === 'ESTUDIANTE');
+  const estudiantesPorCiclo = estudiantes.reduce<EstudiantesPorCiclo[]>((acc, est) => {
     const ciclo = est.ciclo || 1;
-    const existing = acc.find(e => e.ciclo === ciclo);
+    const existing = acc.find((e) => e.ciclo === ciclo);
     if (existing) {
       existing.cantidad += 1;
     } else {
       acc.push({ ciclo, cantidad: 1 });
     }
     return acc;
-  }, [] as any[]).sort((a, b) => a.ciclo - b.ciclo);
+  }, []).sort((a, b) => a.ciclo - b.ciclo);
 
   // Matrículas por curso
   const matriculasPorCurso = appState.cursos.map(curso => ({
@@ -32,16 +43,16 @@ export default function ReportesPage() {
   }));
 
   // Carrera distribution
-  const estudiantesPorCarrera = estudiantes.reduce((acc, est) => {
+  const estudiantesPorCarrera = estudiantes.reduce<EstudiantesPorCarrera[]>((acc, est) => {
     const carrera = est.carrera;
-    const existing = acc.find(e => e.name === carrera);
+    const existing = acc.find((e) => e.name === carrera);
     if (existing) {
       existing.value += 1;
     } else {
       acc.push({ name: carrera, value: 1 });
     }
     return acc;
-  }, [] as any[]);
+  }, []);
 
   return (
     <MainLayout>
@@ -125,7 +136,7 @@ export default function ReportesPage() {
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {estudiantesPorCarrera.map((entry, index) => (
+                    {estudiantesPorCarrera.map((entry: EstudiantesPorCarrera, index: number) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>

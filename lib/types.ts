@@ -13,6 +13,7 @@ export interface User {
   apellido: string;
   rol: UserRole;
   createdAt: string;
+  profilePicture?: string;
 }
 
 // Estudiante
@@ -44,6 +45,8 @@ export interface Curso {
   creditos: number;
   docente_id: string;
   ciclo: number;
+  modalidad: 'presencial' | 'virtual';
+  zoom_link?: string;
   createdAt: string;
 }
 
@@ -115,6 +118,7 @@ export interface ContenidoSemana {
   semana_numero: number;
   titulo: string;
   descripcion: string;
+  zoom_link?: string;
   archivo?: string;  // Base64 material
   nombre_archivo?: string;
   createdAt: string;
@@ -134,6 +138,7 @@ export interface AuthContextType {
   login: (email: string, password: string) => Promise<AuthResponse>;
   signup: (userData: any) => Promise<AuthResponse>;
   logout: () => void;
+  updateUser: (user: User | Estudiante | Docente | Admin) => void;
 }
 
 // App State

@@ -13,10 +13,13 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { invalid, validateDelivery } from '@/lib/validation';
+import { useValidationModal } from '@/components/ui/validation-modal';
 
 export default function TareasPage() {
   const { user } = useAuth();
   const { getMatriculasByEstudiante, getTareasByCurso, getCursoById, getEntregasByEstudiante, addEntrega } = useAppData();
+  const { showValidation, validationModal } = useValidationModal();
   
   const [selectedTarea, setSelectedTarea] = useState<string | null>(null);
   const [entregaData, setEntregaData] = useState({ archivo: '', comentarios: '', nombre_archivo: '' });
@@ -24,6 +27,10 @@ export default function TareasPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        showValidation(invalid('Archivo demasiado grande', ['La entrega no debe superar los 5 MB en esta demo local.']));
+        return;
+      }
       const reader = new FileReader();
       reader.onloadend = () => {
         setEntregaData({ ...entregaData, archivo: reader.result as string, nombre_archivo: file.name });
@@ -37,10 +44,7 @@ export default function TareasPage() {
   const entregas = estudiante ? getEntregasByEstudiante(estudiante.id) : [];
 
   const handleEntregar = () => {
-    if (!entregaData.archivo) {
-      toast.error('Debes proporcionar un enlace/archivo para la entrega');
-      return;
-    }
+    if (showValidation(validateDelivery(entregaData.archivo, entregaData.comentarios))) return;
     if (!selectedTarea || !estudiante) return;
 
     const newEntrega: Entrega = {
@@ -201,6 +205,7 @@ export default function TareasPage() {
           )}
         </div>
       </div>
+      {validationModal}
     </MainLayout>
   );
 }
