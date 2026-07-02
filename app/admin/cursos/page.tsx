@@ -32,6 +32,7 @@ export default function CursosPage() {
   const [selectedCarreras, setSelectedCarreras] = useState<string[]>([]);
   const [studentSearch, setStudentSearch] = useState('');
   const [showAllCareers, setShowAllCareers] = useState(false);
+  const [selectedFilterCarrera, setSelectedFilterCarrera] = useState('');
 
   const generateCourseCode = (nombre: string, ciclo: string) => {
     if (!nombre) return '';
@@ -165,6 +166,9 @@ export default function CursosPage() {
 
   const openMatriculaManager = (cursoId: string) => {
     setSelectedCursoId(cursoId);
+    setStudentSearch('');
+    setSelectedFilterCarrera('');
+    setShowAllCareers(false);
     setIsMatriculaOpen(true);
   };
 
@@ -305,7 +309,7 @@ export default function CursosPage() {
         </div>
 
         <Dialog open={isMatriculaOpen} onOpenChange={setIsMatriculaOpen}>
-          <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col">
+          <DialogContent className="max-w-4xl w-[90vw] h-[80vh] max-h-[90vh] flex flex-col">
             <DialogHeader>
               <DialogTitle>Gestión de Matrículas</DialogTitle>
               <DialogDescription>
@@ -318,7 +322,10 @@ export default function CursosPage() {
               <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">Curso Activo</label>
               <select
                 value={selectedCursoId || ''}
-                onChange={e => setSelectedCursoId(e.target.value)}
+                onChange={e => {
+                  setSelectedCursoId(e.target.value);
+                  setSelectedFilterCarrera('');
+                }}
                 className="w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Seleccionar curso...</option>
@@ -336,24 +343,45 @@ export default function CursosPage() {
                 onChange={e => setStudentSearch(e.target.value)}
                 className="flex-1"
               />
+              
+              {/* Career Filter Dropdown */}
+              <select
+                value={selectedFilterCarrera}
+                onChange={e => setSelectedFilterCarrera(e.target.value)}
+                className="rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[220px]"
+              >
+                <option value="">Todas las carreras</option>
+                {(() => {
+                  const selectedCursoObj = (appState.cursos || []).find(c => c.id === selectedCursoId);
+                  const courseCareers = selectedCursoObj?.carreras ? selectedCursoObj.carreras.split(',') : [];
+                  const careersToShow = showAllCareers ? LISTA_CARRERAS : courseCareers;
+                  return careersToShow.map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ));
+                })()}
+              </select>
+
               <label className="flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer whitespace-nowrap bg-slate-50 border border-slate-200 px-3 py-2 rounded-md">
                 <input
                   type="checkbox"
                   checked={showAllCareers}
-                  onChange={() => setShowAllCareers(!showAllCareers)}
+                  onChange={() => {
+                    setShowAllCareers(!showAllCareers);
+                    setSelectedFilterCarrera('');
+                  }}
                   className="rounded border-slate-300 text-blue-900 focus:ring-blue-500 h-4 w-4"
                 />
                 Ver todas las carreras
               </label>
             </div>
 
-            <div className="flex-1 overflow-y-auto mt-2 border rounded-md">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden mt-2 border rounded-md">
               <table className="w-full text-sm text-left">
                 <thead className="bg-slate-50 text-slate-700 sticky top-0 border-b">
                   <tr>
-                    <th className="px-4 py-3">Estudiante</th>
-                    <th className="px-4 py-3">Carrera</th>
-                    <th className="px-4 py-3 text-center">Acción</th>
+                    <th className="px-4 py-3 w-2/5">Estudiante</th>
+                    <th className="px-4 py-3 w-2/5">Carrera</th>
+                    <th className="px-4 py-3 text-center w-1/5">Acción</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
@@ -363,7 +391,14 @@ export default function CursosPage() {
                     
                     const filtered = todosLosEstudiantes.filter(est => {
                       const searchMatch = `${est.nombre} ${est.apellido} ${est.email}`.toLowerCase().includes(studentSearch.toLowerCase());
-                      const careerMatch = showAllCareers || courseCareers.length === 0 || (est.carrera && courseCareers.includes(est.carrera));
+                      
+                      let careerMatch = false;
+                      if (selectedFilterCarrera) {
+                        careerMatch = est.carrera === selectedFilterCarrera;
+                      } else {
+                        careerMatch = showAllCareers || courseCareers.length === 0 || (est.carrera && courseCareers.includes(est.carrera));
+                      }
+                      
                       return searchMatch && careerMatch;
                     });
 
@@ -383,20 +418,20 @@ export default function CursosPage() {
 
                       return (
                         <tr key={est.id} className="hover:bg-slate-50">
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-3 align-middle">
                             <div className="font-medium text-slate-900">{est.nombre} {est.apellido}</div>
-                            <div className="text-xs text-slate-500">{est.email}</div>
+                            <div className="text-xs text-slate-500 font-mono">{est.email}</div>
                           </td>
-                          <td className="px-4 py-3">
-                            <span className="inline-block text-[11px] bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full font-medium" title={est.carrera}>
+                          <td className="px-4 py-3 align-middle">
+                            <span className="inline-block text-[11px] bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full font-medium whitespace-normal break-words max-w-[280px]" title={est.carrera}>
                               {est.carrera || 'No asignada'}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-center">
+                          <td className="px-4 py-3 text-center align-middle">
                              <Button 
                                variant={isEnrolled ? 'default' : 'outline'}
                                size="sm"
-                               className={isEnrolled ? 'bg-green-600 hover:bg-green-700 text-white font-medium border-0' : 'text-slate-600 font-medium'}
+                               className={isEnrolled ? 'bg-green-600 hover:bg-green-700 text-white font-medium border-0 w-32' : 'text-slate-600 font-medium w-32'}
                                onClick={() => handleToggleMatricula(est.id, isEnrolled, matricula?.id)}
                              >
                                {isEnrolled ? 'Matriculado' : 'Añadir al curso'}
