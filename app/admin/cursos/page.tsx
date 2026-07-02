@@ -197,7 +197,7 @@ export default function CursosPage() {
                 Crear Nuevo Curso
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>{editingCursoId ? 'Editar Curso' : 'Crear Curso'}</DialogTitle>
                 <DialogDescription>Define los parámetros del curso y asígnale un Docente titular.</DialogDescription>
@@ -311,7 +311,7 @@ export default function CursosPage() {
         </div>
 
         <Dialog open={isMatriculaOpen} onOpenChange={setIsMatriculaOpen}>
-          <DialogContent className="max-w-6xl w-[95vw] md:w-[90vw] max-h-[90vh] flex flex-col overflow-hidden">
+          <DialogContent className="sm:max-w-6xl w-[95vw] md:w-[90vw] max-h-[90vh] flex flex-col overflow-hidden">
             <DialogHeader>
               <DialogTitle>Gestión de Matrículas</DialogTitle>
               <DialogDescription>
