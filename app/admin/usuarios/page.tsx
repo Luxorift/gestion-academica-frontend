@@ -59,40 +59,23 @@ export default function GestionUsuariosPage() {
     nivel_acceso: ''
   });
 
-  const generateStudentCode = () => {
+  const generateUserCode = (rol: string) => {
     const yearSuffix = String(new Date().getFullYear()).slice(-2);
-    const prefix = `U${yearSuffix}`;
-    const studentCodes = (appState.usuarios || [])
-      .filter(u => u.rol === 'ESTUDIANTE' && u.codigo && u.codigo.startsWith(prefix))
+    const prefix = rol === 'ESTUDIANTE' ? 'U' : rol === 'DOCENTE' ? 'D' : 'A';
+    const codePrefix = `${prefix}${yearSuffix}`;
+    const codes = (appState.usuarios || [])
+      .filter(u => u.rol === rol && u.codigo && u.codigo.startsWith(codePrefix))
       .map(u => {
-        const numPart = u.codigo.slice(prefix.length);
+        const numPart = u.codigo.slice(codePrefix.length);
         const parsed = parseInt(numPart, 10);
         return isNaN(parsed) ? 0 : parsed;
       });
-    const maxNumber = studentCodes.length > 0 ? Math.max(...studentCodes) : 0;
+    const maxNumber = codes.length > 0 ? Math.max(...codes) : 0;
     const nextNumber = maxNumber + 1;
     const paddedNumber = String(nextNumber).padStart(3, '0');
-    return `${prefix}${paddedNumber}`;
+    return `${codePrefix}${paddedNumber}`;
   };
 
-  const generateEmailFromName = (nombre: string, apellido: string, rol: string) => {
-    if (!nombre.trim() && !apellido.trim()) return '';
-    const clean = (str: string) => {
-      const parts = str.trim().toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9\s]/g, '')
-        .split(/\s+/);
-      return parts[0] || '';
-    };
-    const prefix = rol === 'ADMIN' ? 'a' : rol === 'DOCENTE' ? 'd' : 'e';
-    const n = clean(nombre);
-    const a = clean(apellido);
-    if (n && a) return `${prefix}.${n}.${a}@nuevaschool.pe`;
-    if (n) return `${prefix}.${n}@nuevaschool.pe`;
-    if (a) return `${prefix}.${a}@nuevaschool.pe`;
-    return '';
-  };
 
   const getFilteredUsers = () => {
     return (appState.usuarios || []).filter(u => u.rol === activeRole);
@@ -289,11 +272,10 @@ export default function GestionUsuariosPage() {
                             const nameVal = e.target.value;
                             setFormData(prev => {
                               const nextFormData = { ...prev, nombre: nameVal };
-                              if (!editingId && !emailManuallyEdited) {
-                                nextFormData.email = generateEmailFromName(nameVal, prev.apellido, prev.rol);
-                              }
-                              if (!editingId && prev.rol === 'ESTUDIANTE' && nameVal.trim() && prev.apellido.trim() && !prev.codigo) {
-                                nextFormData.codigo = generateStudentCode();
+                              if (!editingId && nameVal.trim() && prev.apellido.trim() && !prev.codigo) {
+                                const code = generateUserCode(prev.rol);
+                                nextFormData.codigo = code;
+                                nextFormData.email = `${code}@nuevaschool.pe`.toLowerCase();
                               }
                               return nextFormData;
                             });
@@ -310,11 +292,10 @@ export default function GestionUsuariosPage() {
                             const surnameVal = e.target.value;
                             setFormData(prev => {
                               const nextFormData = { ...prev, apellido: surnameVal };
-                              if (!editingId && !emailManuallyEdited) {
-                                nextFormData.email = generateEmailFromName(prev.nombre, surnameVal, prev.rol);
-                              }
-                              if (!editingId && prev.rol === 'ESTUDIANTE' && prev.nombre.trim() && surnameVal.trim() && !prev.codigo) {
-                                nextFormData.codigo = generateStudentCode();
+                              if (!editingId && prev.nombre.trim() && surnameVal.trim() && !prev.codigo) {
+                                const code = generateUserCode(prev.rol);
+                                nextFormData.codigo = code;
+                                nextFormData.email = `${code}@nuevaschool.pe`.toLowerCase();
                               }
                               return nextFormData;
                             });
@@ -327,14 +308,10 @@ export default function GestionUsuariosPage() {
                         <Input 
                           type="email" 
                           required 
+                          readOnly={!editingId}
                           value={formData.email} 
-                          onChange={e => {
-                            setFormData({...formData, email: e.target.value});
-                            if (!editingId) {
-                              setEmailManuallyEdited(true);
-                            }
-                          }} 
-                          className="mt-1" 
+                          onChange={e => setFormData({...formData, email: e.target.value})} 
+                          className={`mt-1 font-mono ${!editingId ? 'bg-slate-50 cursor-not-allowed' : ''}`}
                         />
                       </div>
                       {!editingId && (
@@ -388,6 +365,10 @@ export default function GestionUsuariosPage() {
                     {formData.rol === 'DOCENTE' && (
                       <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                         <div className="col-span-2">
+                          <label className="text-sm font-medium">Código de Docente</label>
+                          <Input required readOnly value={formData.codigo} className="mt-1 bg-slate-50 cursor-not-allowed font-mono" />
+                        </div>
+                        <div className="col-span-2">
                           <label className="text-sm font-medium">Departamento Académico</label>
                           <select 
                             required 
@@ -420,6 +401,10 @@ export default function GestionUsuariosPage() {
 
                     {formData.rol === 'ADMIN' && (
                       <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                        <div className="col-span-2">
+                          <label className="text-sm font-medium">Código de Administrador</label>
+                          <Input required readOnly value={formData.codigo} className="mt-1 bg-slate-50 cursor-not-allowed font-mono" />
+                        </div>
                         <div className="col-span-2">
                           <label className="text-sm font-medium">Nivel de Acceso</label>
                           <Input required value={formData.nivel_acceso} onChange={e => setFormData({...formData, nivel_acceso: e.target.value})} placeholder="Ej: super, coordinador, soporte" className="mt-1" />
