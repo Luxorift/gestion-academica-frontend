@@ -90,6 +90,13 @@ export const LoginForm: React.FC = () => {
       webcamStream.getTracks().forEach(track => track.stop());
       setWebcamStream(null);
     }
+    const canvas = document.getElementById('face-canvas') as HTMLCanvasElement;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
   };
 
   const startWebcam = async () => {
@@ -118,68 +125,87 @@ export const LoginForm: React.FC = () => {
 
     setFaceLoginStatus('RECOGNIZING');
     
-    let isChecking = false;
-    let scanCount = 0;
-    
-    const intervalId = setInterval(async () => {
-      if (!stream.active || !video.srcObject) {
-        clearInterval(intervalId);
-        return;
-      }
+    const canvas = document.getElementById('face-canvas') as HTMLCanvasElement;
+    if (canvas) {
+      // Ajustar dimensiones del canvas al tamaño del video en CSS
+      const displaySize = { width: video.clientWidth || 640, height: video.clientHeight || 480 };
+      faceapi.matchDimensions(canvas, displaySize);
+
+      let isChecking = false;
+      let scanCount = 0;
       
-      if (isChecking) return;
-      isChecking = true;
-      scanCount++;
-
-      try {
-        const detection = await faceapi.detectSingleFace(video)
-          .withFaceLandmarks()
-          .withFaceDescriptor();
-
-        if (detection) {
-          const embedding = Array.from(detection.descriptor);
-          
-          const res = await fetch('/api/auth/login-facial', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email.trim(), embedding })
-          });
-
-          if (res.ok) {
-            clearInterval(intervalId);
-            const data = await res.json();
-            
-            localStorage.setItem('nuevaschool_token', data.access_token);
-            if (data.user) {
-              localStorage.setItem('nuevaschool_user', JSON.stringify(data.user));
-            }
-            
-            toast.success('Rostro reconocido con éxito. Ingresando...');
-            stopWebcam();
-            setIsFaceModalOpen(false);
-            
-            setTimeout(() => {
-              window.location.href = '/dashboard';
-            }, 500);
-            return;
-          } else {
-            const errDetail = await res.json().catch(() => ({}));
-            console.log('Intento de reconocimiento fallido:', errDetail.detail);
-          }
+      const intervalId = setInterval(async () => {
+        if (!stream.active || !video.srcObject) {
+          clearInterval(intervalId);
+          return;
         }
-      } catch (err) {
-        console.error('Error en intervalo de detección:', err);
-      } finally {
-        isChecking = false;
         
+        scanCount++;
+
+        try {
+          const detection = await faceapi.detectSingleFace(video)
+            .withFaceLandmarks()
+            .withFaceDescriptor();
+
+          // Limpiar canvas anterior
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+          }
+
+          if (detection) {
+            const resizedDetection = faceapi.resizeResults(detection, displaySize);
+            
+            // Dibujar contornos del rostro en tiempo real
+            faceapi.draw.drawFaceLandmarks(canvas, resizedDetection);
+            
+            if (isChecking) return;
+            isChecking = true;
+
+            const embedding = Array.from(detection.descriptor);
+            
+            const res = await fetch('/api/auth/login-facial', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: email.trim(), embedding })
+            });
+
+            if (res.ok) {
+              clearInterval(intervalId);
+              const data = await res.json();
+              
+              localStorage.setItem('nuevaschool_token', data.access_token);
+              if (data.user) {
+                localStorage.setItem('nuevaschool_user', JSON.stringify(data.user));
+              }
+              
+              toast.success('Rostro reconocido con éxito. Ingresando...');
+              stopWebcam();
+              setIsFaceModalOpen(false);
+              
+              setTimeout(() => {
+                window.location.href = '/dashboard';
+              }, 500);
+              return;
+            } else {
+              const errDetail = await res.json().catch(() => ({}));
+              console.log('Intento de reconocimiento fallido:', errDetail.detail);
+              isChecking = false;
+            }
+          }
+        } catch (err) {
+          console.error('Error en intervalo de detección:', err);
+          isChecking = false;
+        }
+
         if (scanCount > 80) { // ~24 segundos
           clearInterval(intervalId);
           setFaceLoginStatus('ERROR');
           setFaceErrorMsg('Tiempo de espera agotado. Asegúrate de tener buena iluminación frente a la cámara.');
           stopWebcam();
         }
-      }
-    }, 300);
+      }, 300);
+    }
   };
 
   const resetRecovery = () => {
@@ -521,6 +547,10 @@ export const LoginForm: React.FC = () => {
                 playsInline 
                 className="w-full h-full object-cover scale-x-[-1]" 
               />
+              <canvas 
+                id="face-canvas" 
+                className="absolute inset-0 w-full h-full object-cover scale-x-[-1] pointer-events-none" 
+              />
               
               {/* Overlay states */}
               {(faceLoginStatus === 'LOADING' || loadingModels) && (
@@ -532,12 +562,39 @@ export const LoginForm: React.FC = () => {
               )}
               
               {faceLoginStatus === 'RECOGNIZING' && (
-                <div className="absolute inset-x-0 top-3 flex justify-center">
-                  <span className="bg-blue-600/90 text-white text-[10px] uppercase font-bold tracking-wider px-3 py-1 rounded-full animate-pulse">
-                    Escaneando Rostro...
-                  </span>
-                </div>
+                <>
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="relative w-48 h-48 border border-dashed border-blue-500/20 rounded-2xl flex items-center justify-center animate-pulse">
+                      {/* Corner marks */}
+                      <span className="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-blue-500 rounded-tl-md"></span>
+                      <span className="absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 border-blue-500 rounded-tr-md"></span>
+                      <span className="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-blue-500 rounded-bl-md"></span>
+                      <span className="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-blue-500 rounded-br-md"></span>
+                    </div>
+                  </div>
+                  
+                  {/* Laser scan line */}
+                  <div className="absolute inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent shadow-[0_0_8px_rgba(59,130,246,0.6)] animate-scan pointer-events-none"></div>
+
+                  <div className="absolute inset-x-0 top-3 flex justify-center pointer-events-none">
+                    <span className="bg-blue-600/90 text-white text-[10px] uppercase font-bold tracking-wider px-3 py-1 rounded-full animate-pulse">
+                      Escaneando Rostro...
+                    </span>
+                  </div>
+                </>
               )}
+
+              <style>{`
+                @keyframes scanAnimation {
+                  0% { top: 0%; }
+                  50% { top: 100%; }
+                  100% { top: 0%; }
+                }
+                .animate-scan {
+                  position: absolute;
+                  animation: scanAnimation 2.2s linear infinite;
+                }
+              `}</style>
             </div>
 
             {faceLoginStatus === 'ERROR' && (
