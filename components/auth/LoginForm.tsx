@@ -176,7 +176,7 @@ export const LoginForm: React.FC = () => {
               
               localStorage.setItem('nuevaschool_token', data.access_token);
               if (data.user) {
-                localStorage.setItem('nuevaschool_user', JSON.stringify(data.user));
+                localStorage.setItem('nuevaschool_auth', JSON.stringify(data.user));
               }
               
               toast.success('Rostro reconocido con éxito. Ingresando...');
