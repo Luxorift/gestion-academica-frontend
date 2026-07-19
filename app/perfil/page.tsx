@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { validatePasswordChange } from '@/lib/validation';
 import { useValidationModal } from '@/components/ui/validation-modal';
-import { Camera } from 'lucide-react';
+import { Camera, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Script from 'next/script';
 
@@ -334,16 +334,39 @@ export default function MiPerfilPage() {
                   Sube una imagen (JPG, PNG) de máximo 2MB.
                 </p>
                 <div className="mt-4 flex items-center justify-between border-t pt-4">
-                  <div>
+                  <div className="space-y-1">
                     <h4 className="text-sm font-semibold text-slate-900">Reconocimiento Facial</h4>
-                    <p className="text-xs text-slate-500">
-                      {(user as any).face_embedding 
-                        ? '✅ Rostro registrado. Puedes iniciar sesión con tu cámara.' 
-                        : '❌ Rostro no registrado. Sube una foto de perfil clara.'}
-                    </p>
+                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                      {(user as any).face_embedding ? (
+                        <>
+                          <CheckCircle2 className="h-4 w-4 text-slate-700" />
+                          <span>Rostro registrado. Listo para inicio de sesión facial.</span>
+                        </>
+                      ) : (
+                        <>
+                          <XCircle className="h-4 w-4 text-slate-400" />
+                          <span>Rostro no registrado. Sube una foto de perfil clara.</span>
+                        </>
+                      )}
+                    </div>
                   </div>
-                  <span className={`text-[10px] font-medium ${faceApiLoaded ? 'text-green-600' : 'text-slate-400'}`}>
-                    {faceApiLoaded ? '● Modelos listos' : loadingModels ? '⏳ Cargando modelos IA...' : '● Iniciando...'}
+                  <span className="text-[10px] font-medium text-slate-500 flex items-center gap-1">
+                    {faceApiLoaded ? (
+                      <>
+                        <span className="h-1.5 w-1.5 rounded-full bg-slate-950"></span>
+                        Modelos listos
+                      </>
+                    ) : loadingModels ? (
+                      <>
+                        <Loader2 className="h-3 w-3 animate-spin text-slate-600" />
+                        Cargando...
+                      </>
+                    ) : (
+                      <>
+                        <span className="h-1.5 w-1.5 rounded-full bg-slate-300"></span>
+                        Iniciando...
+                      </>
+                    )}
                   </span>
                 </div>
               </div>
