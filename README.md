@@ -1,102 +1,103 @@
 <div align="center">
-  <img src="https://img.shields.i⚙️/badge/Next.js-14-black?style=f⚙️r-the-badge&l⚙️g⚙️=next.js&l⚙️g⚙️C⚙️l⚙️r=white" alt="Next.js" />
-  <img src="https://img.shields.i⚙️/badge/React-18-007ACC?style=f⚙️r-the-badge&l⚙️g⚙️=react&l⚙️g⚙️C⚙️l⚙️r=white" alt="React" />
-  <img src="https://img.shields.i⚙️/badge/TailwindCSS-38B2AC?style=f⚙️r-the-badge&l⚙️g⚙️=tailwind-css&l⚙️g⚙️C⚙️l⚙️r=white" alt="TailwindCSS" />
-  <img src="https://img.shields.i⚙️/badge/TypeScript-3178C6?style=f⚙️r-the-badge&l⚙️g⚙️=typescript&l⚙️g⚙️C⚙️l⚙️r=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/React-18-007ACC?style=for-the-badge&logo=react&logoColor=white" alt="React" />
+  <img src="https://img.shields.io/badge/TailwindCSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="TailwindCSS" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
 </div>
 
-<h1 align="center">🎓 NuevaSch⚙️⚙️l - Sistema Integral de Gestión Académica</h1>
+<h1 align="center">🎓 NuevaSchool - Sistema Integral de Gestión Académica</h1>
 
 <p align="center">
-  Plataf⚙️rma web m⚙️derna y r⚙️busta para la administración de instituci⚙️nes educativas, gestión de calificaci⚙️nes, c⚙️ntr⚙️l de asistencia y aulas virtuales.
+  Plataforma web moderna y robusta para la administración de instituciones educativas, gestión de calificaciones, control de asistencia y aulas virtuales.
 </p>
 
 <div align="center">
   <h3>
-    <a href="https://nuevasch⚙️⚙️l.⚙️nrender.c⚙️m">🚀 VER DEMO EN VIVO</a>
+    <a href="https://nuevaschool.onrender.com">🚀 VER DEMO EN VIVO</a>
   </h3>
 </div>
 
 ---
 
-## 🌟 S⚙️bre el Pr⚙️yect⚙️
+## 🌟 Sobre el Proyecto
 
-**NuevaSch⚙️⚙️l** nace c⚙️n el ⚙️bjetiv⚙️ de pr⚙️fesi⚙️nalizar la gestión académica mediante una interfaz m⚙️derna, rápida y adaptable (M⚙️bile-First). El sistema permite una interc⚙️nexión fluida entre tres r⚙️les principales: **Administrad⚙️res, D⚙️centes y Estáudiantes**, agilizand⚙️ pr⚙️ces⚙️s que n⚙️rmalmente c⚙️nsumen tiemp⚙️ en las instituci⚙️nes tradici⚙️nales.
+**NuevaSchool** nace con el objetivo de profesionalizar la gestión académica mediante una interfaz moderna, rápida y adaptable (Mobile-First). El sistema permite una interconexión fluida entre tres roles principales: **Administradores, Docentes y Estudiantes**, agilizando procesos que normalmente consumen tiempo en las instituciones tradicionales.
 
-## ✨ Funci⚙️nalidades Principales
+## ✨ Funcionalidades Principales
 
-El pr⚙️yect⚙️ utiliza una arquitectura de base de dat⚙️s l⚙️cal (IndexedDB a través de `l⚙️calF⚙️rage`) para garantizar una persistencia de dat⚙️s ultra-rápida en el ent⚙️rn⚙️ del navegad⚙️r, permitiend⚙️ crear, editar y eliminar registr⚙️s sin necesidad de una API externa durante esta fase del despliegue.
+El proyecto utiliza una arquitectura de base de datos local (IndexedDB a través de `localForage`) para garantizar una persistencia de datos ultra-rápida en el entorno del navegador, permitiendo crear, editar y eliminar registros sin necesidad de una API externa durante esta fase del despliegue.
 
-### 👑 Panel de Administrad⚙️r
-- **Dashb⚙️ard Estáadístic⚙️:** Gráfic⚙️s dinámic⚙️s c⚙️n el recuent⚙️ t⚙️tal de alumn⚙️s, d⚙️centes y carreras.
-- **Gestión de Usuari⚙️s (CRUD):** Creación y administración c⚙️mpleta de perfiles instituci⚙️nales.
-- **Gestión de Curs⚙️s y Matrículas:** Asignación de d⚙️centes a materias y matriculación de estudiantes a l⚙️s mism⚙️s.
+### 👑 Panel de Administrador
+- **Dashboard Estadístico:** Gráficos dinámicos con el recuento total de alumnos, docentes y carreras.
+- **Gestión de Usuarios (CRUD):** Creación y administración completa de perfiles institucionales.
+- **Gestión de Cursos y Matrículas:** Asignación de docentes a materias y matriculación de estudiantes a los mismos.
 
-### 👨‍🏫 Módul⚙️ para D⚙️centes
-- **Panel de Clases:** Resumen de las materias asignadas y estudiantes a carg⚙️.
-- **Registr⚙️ de Evaluaci⚙️nes:** Interfaz ágil para la calificación de n⚙️tas (PC1, Parcial, Final) c⚙️n pr⚙️medi⚙️s aut⚙️mátic⚙️s.
-- **C⚙️ntr⚙️l de Asistencia:** Registr⚙️ diari⚙️ de inasistencias y tardanzas.
-- **Gestión de Tareas:** Publicación de asignaci⚙️nes para que l⚙️s alumn⚙️s entreguen sus trabaj⚙️s.
+### 👨‍🏫 Módulo para Docentes
+- **Panel de Clases:** Resumen de las materias asignadas y estudiantes a cargo.
+- **Registro de Evaluaciones:** Interfaz ágil para la calificación de notas (PC1, Parcial, Final) con promedios automáticos.
+- **Control de Asistencia:** Registro diario de inasistencias y tardanzas.
+- **Gestión de Tareas:** Publicación de asignaciones para que los alumnos entregen sus trabajos.
 
-### 👨‍🎓 P⚙️rtal del Estáudiante
-- **Hist⚙️rial Académic⚙️:** Visualización en tiemp⚙️ real del pr⚙️medi⚙️ de sus curs⚙️s.
-- **Aulas Virtuales:** Acces⚙️ a temari⚙️s, entrega de tareas en PDF y visualización de n⚙️tas.
-- **Rep⚙️rte de Asistencias:** Verificación de su estad⚙️ en cada clase dictada.
+### 👨‍🎓 Portal del Estudiante
+- **Historial Académico:** Visualización en tiempo real del promedio de sus cursos.
+- **Aulas Virtuales:** Acceso a temarios, entrega de tareas en PDF y visualización de notas.
+- **Reporte de Asistencias:** Verificación de su estado en cada clase dictada.
+- **Inicio de Sesión Holográfico:** Acceso biométrico interactivo con escaneo facial por cámara web en tiempo real, incluyendo barrido láser, retícula de enfoque y mapeo de contornos del rostro (landmarks) en vivo.
 
 ---
 
-## 🔑 Credenciales de Acces⚙️ (Dem⚙️)
+## 🔑 Credenciales de Acceso (Demo)
 
-Puedes ingresar al dem⚙️ en viv⚙️ utilizand⚙️ l⚙️s siguientes c⚙️rre⚙️s y c⚙️ntraseñas. Cada un⚙️ te llevará a un Dashb⚙️ard distint⚙️ según l⚙️s permis⚙️s de su r⚙️l:
+Puedes ingresar al demo en vivo utilizando los siguientes correos y contraseñas. Cada uno te llevará a un Dashboard distinto según los permisos de su rol:
 
-| R⚙️l | C⚙️rre⚙️ Electrónic⚙️ | C⚙️ntraseña |
+| Rol | Correo Electrónico | Contraseña |
 | :--- | :--- | :--- |
-| **Administrad⚙️r** | `admin@nuevasch⚙️⚙️l.pe` | `admin123` |
-| **D⚙️cente** | `d⚙️cente@nuevasch⚙️⚙️l.pe` | `d⚙️cente123` |
-| **Estáudiante** | `estudiante@nuevasch⚙️⚙️l.pe` | `estudiante123` |
+| **Administrador** | `admin@nuevaschool.pe` | `admin123` |
+| **Docente** | `docente@nuevaschool.pe` | `docente123` |
+| **Estudiante** | `estudiante@nuevaschool.pe` | `estudiante123` |
 
-> **N⚙️ta:** Puedes crear nuev⚙️s usuari⚙️s en el panel de Administrad⚙️r y asignarles sus pr⚙️pi⚙️s c⚙️rre⚙️s y c⚙️ntraseñas. ¡¡Tienen validación de d⚙️mini⚙️ ⚙️bligat⚙️ria!
+> **Nota:** Puedes crear nuevos usuarios en el panel de Administrador y asignarles sus propios correos y contraseñas. ¡Tienen validación de dominio obligatoria!
 
 ---
 
-## 🛠️ Tecn⚙️l⚙️gías Utilizadas
+## 🛠️ Tecnologías Utilizadas
 
-- **Fr⚙️ntend:** Next.js (App R⚙️uter), React, TypeScript.
-- **Estáil⚙️s:** TailwindCSS, C⚙️mp⚙️nentes de UI basad⚙️s en Shadcn.
-- **Persistencia de Dat⚙️s:** IndexedDB (`l⚙️calF⚙️rage`).
-- **Ic⚙️n⚙️s:** Lucide-React.
+- **Frontend:** Next.js (App Router), React, TypeScript.
+- **Estilos:** TailwindCSS, Componentes de UI basados en Shadcn.
+- **Persistencia de Datos:** IndexedDB (`localForage`).
+- **Iconos:** Lucide-React.
 - **Despliegue:** Render.
 
 ---
 
-## 🚀 Despliegue L⚙️cal (Para Desarr⚙️llad⚙️res)
+## 🚀 Despliegue Local (Para Desarrolladores)
 
-Si deseas cl⚙️nar el pr⚙️yect⚙️ y c⚙️rrerl⚙️ en tu máquina:
+Si deseas clonar el proyecto y correrlo en tu máquina:
 
-1. **Cl⚙️nar el rep⚙️sit⚙️ri⚙️:**
+1. **Clonar el repositorio:**
 ```bash
-git cl⚙️ne https://github.c⚙️m/Lux⚙️rift/gesti⚙️n-academica-fr⚙️ntend.git
-cd gesti⚙️n-academica-fr⚙️ntend
+git clone https://github.com/Luxorift/gestion-academica-frontend.git
+cd gestion-academica-frontend
 ```
 
 2. **Instalar dependencias:**
 ```bash
 npm install
-# ⚙️ c⚙️n pnpm
+# o con pnpm
 pnpm install
 ```
 
-3. **Ejecutar en m⚙️d⚙️ desarr⚙️ll⚙️:**
+3. **Ejecutar en modo desarrollo:**
 ```bash
 npm run dev
 ```
 
-4. **Abrir en tu navegad⚙️r:**
-Navega a `http://l⚙️calh⚙️st:3000` para ver la aplicación funci⚙️nand⚙️ l⚙️calmente.
+4. **Abrir en tu navegador:**
+Navega a `http://localhost:3000` para ver la aplicación funcionando localmente.
 
-5. **Ejecutar audit⚙️ría:**
+5. **Ejecutar auditoría:**
 ```bash
-npx unlighth⚙️use --site https://nuevasch⚙️⚙️l.⚙️nrender.c⚙️m/
+npx unlighthouse --site https://nuevaschool.onrender.com/
 ```
 
 ---
